@@ -17,6 +17,6 @@ ENV PATH /opt/conda/bin:$PATH
 RUN conda config --add channels defaults \
     && conda config --add channels bioconda \
     && conda config --add channels conda-forge \
-    && conda install -y spring
+    && conda install -y spring=1.1.1=h9f5acd7_0
 
 CMD ["spring"]
