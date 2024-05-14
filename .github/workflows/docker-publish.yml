@@ -52,6 +52,8 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          build-args: |
+            OPTIMIZE_FOR_PORTABILITY=OFF
           platforms: linux/amd64
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
@@ -62,3 +64,19 @@ jobs:
             org.opencontainers.image.url=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.url'] }}
             org.opencontainers.image.version=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
 
+      - name: Build and push Docker image with no opt
+        id: build-and-push-noopt
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          build-args: |
+            OPTIMIZE_FOR_PORTABILITY=ON
+          platforms: linux/amd64
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}-noopt
+          labels: |
+            org.opencontainers.image.created=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.created'] }}
+            org.opencontainers.image.revision=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.revision'] }}
+            org.opencontainers.image.source=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.source'] }}
+            org.opencontainers.image.url=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.url'] }}
+            org.opencontainers.image.version=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}

@@ -1,22 +1,33 @@
-FROM ubuntu:22.04
+FROM ubuntu:20.04 as builder
+
+ARG OPTIMIZE_FOR_PORTABILITY
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && apt-get install -y gzip pigz wget bzip2 ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update \
+  && apt install -y --no-install-recommends ca-certificates g++ cmake wget make zlib1g-dev \
+  && wget https://github.com/shubhamchandak94/Spring/archive/refs/tags/v1.1.1.tar.gz \
+  && tar xvzf v1.1.1.tar.gz \
+  && cd Spring-1.1.1 \
+  && mkdir build \
+  && cd build/ \
+  && cmake .. -Dspring_optimize_for_portability=${OPTIMIZE_FOR_PORTABILITY} \
+  && make
 
-RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh \
-    && /bin/bash ~/miniconda.sh -b -p /opt/conda \
-    && rm ~/miniconda.sh \
-    && ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh \
-    && echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc \
-    && echo "conda activate base" >> ~/.bashrc
+FROM ubuntu:20.04
 
-ENV PATH /opt/conda/bin:$PATH
+LABEL org.opencontainers.image.title="Docker image for Spring"
+LABEL org.opencontainers.image.authors="Julien FOURET"
+LABEL org.opencontainers.image.description="https://github.com/shubhamchandak94/Spring"
+LABEL org.opencontainers.image.vendor="Nexomis"
+LABEL org.opencontainers.image.licenses="Apache-2.0"
 
-RUN conda config --add channels defaults \
-    && conda config --add channels bioconda \
-    && conda config --add channels conda-forge \
-    && conda install -y spring=1.1.1=h9f5acd7_0
+ENV DEBIAN_FRONTEND=noninteractive
 
-CMD ["spring"]
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends zlib1g libgomp1 \
+  && rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /Spring-1.1.1/build/spring /usr/local/bin/spring
+
+ENTRYPOINT ["/usr/local/bin/spring"]
