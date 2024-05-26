@@ -25,11 +25,7 @@ LABEL org.opencontainers.image.licenses="Apache-2.0"
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends zlib1g libgomp1 python3 python3-psutil wget ca-certificates \
-  && wget https://raw.githubusercontent.com/nexomis/check_fastq/6d92856feb226f958e1203275f696b76bcf8e704/src/check_fastq.py \
-  && mv check_fastq.py /usr/local/bin/check_fastq.py && chmod o+rx /usr/local/bin/check_fastq.py \
-  && apt-get remove -y wget ca-certificates \
-  && ln -sf /usr/bin/python3 /usr/local/bin/python \
+  && apt-get install -y --no-install-recommends zlib1g libgomp1 \
   && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /Spring-1.1.1/build/spring /usr/local/bin/spring
