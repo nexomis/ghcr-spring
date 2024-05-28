@@ -29,5 +29,3 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /Spring-1.1.1/build/spring /usr/local/bin/spring
-
-ENTRYPOINT [""]
